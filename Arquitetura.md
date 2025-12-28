@@ -10,12 +10,12 @@ flowchart TB
     subgraph BACKEND[Backend Layer - Java Spring Boot]
         API[Spring Boot API - CRM Principal]
         SECURITY[Keycloak - Autenticação e RBAC]
-        KAFKA[Apache Kafka - Mensageria]
+        KAFKA[Apache Rabbitmq- Mensageria]
         REDIS[Redis - Cache e Lock]
     end
 
     subgraph DATA[Data Layer]
-        ORACLE[(Oracle Database)]
+        PostgreeSQL[(PostgreeSQL Database)]
         MINIO[(MinIO - Armazenamento de Arquivos)]
     end
 
@@ -41,7 +41,7 @@ flowchart TB
     %% Fluxos principais
     %% =======================
     REACT -->|HTTP REST| API
-    API -->|JDBC| ORACLE
+    API -->|JDBC| PostgreeSQL
     API -->|REST Auth| SECURITY
     API -->|Publica Eventos| KAFKA
     API -->|Cache| REDIS
@@ -51,8 +51,8 @@ flowchart TB
     PYAI -->|Consulta Dados| PostgreSql
     PYAI -->|Grava Resultados| MINIO
 
-    KAFKA --> API
-    KAFKA --> PYAI
+    Rabbitmq--> API
+    Rabbitmq--> PYAI
 
     API -->|Métricas| PROMETHEUS
     API -->|Logs| LOKI
@@ -63,7 +63,7 @@ flowchart TB
 
     DOCKER --> API
     DOCKER --> PYAI
-    DOCKER --> ORACLE
+    DOCKER --> PostgreeSQL
     DOCKER --> KAFKA
     DOCKER --> REDIS
     DOCKER --> MINIO
