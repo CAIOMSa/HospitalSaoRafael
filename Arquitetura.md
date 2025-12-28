@@ -47,8 +47,8 @@ flowchart TB
     API -->|Cache| REDIS
     API -->|Upload de Arquivos| MINIO
 
-    PYAI -->|Consome Eventos| KAFKA
-    PYAI -->|Consulta Dados| ORACLE
+    PYAI -->|Consome Eventos| Rabbitmq
+    PYAI -->|Consulta Dados| PostgreSql
     PYAI -->|Grava Resultados| MINIO
 
     KAFKA --> API
