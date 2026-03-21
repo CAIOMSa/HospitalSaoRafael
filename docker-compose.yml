@@ -223,28 +223,6 @@ services:
       - ./python/ai-service:/app
 
   # =====================
-  # Frontend - React
-  # =====================
-  frontend:
-    build:
-      context: ./front-end
-      dockerfile: Dockerfile
-    container_name: crm-frontend
-    environment:
-      REACT_APP_API_URL: http://localhost:8081/api
-      REACT_APP_KEYCLOAK_URL: http://localhost:8080
-      REACT_APP_KEYCLOAK_REALM: crm-realm
-      REACT_APP_KEYCLOAK_CLIENT_ID: crm-frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - crm-core
-      - keycloak
-    networks:
-      - crm-network
-
-
-  # =====================
   # Observability Layer
   # =====================
   prometheus:

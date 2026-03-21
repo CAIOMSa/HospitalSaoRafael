@@ -73,7 +73,6 @@ echo   - rabbitmq
 echo   - minio
 echo   - prometheus
 echo   - grafana
-echo   - frontend
 echo.
 set /p servico="Digite o nome do serviço (ou deixe vazio para todos): "
 cls

@@ -2,7 +2,7 @@
 chcp 65001 >nul
 echo ========================================
 echo  CRM São Rafael - Dev Mode
-echo  (Frontend + Backend em desenvolvimento)
+echo  (Backend Java + Python em desenvolvimento)
 echo ========================================
 echo.
 
@@ -33,9 +33,6 @@ start "CRM Core - Backend" cmd /k "cd crm-core && mvnw spring-boot:run"
 REM Aguarda um pouco
 timeout /t 3 /nobreak >nul
 
-REM Abre o frontend em uma nova janela
-start "CRM Frontend - React" cmd /k "cd front-end && npm start"
-
 REM Abre o Python AI em uma nova janela
 start "Python AI Service" cmd /k "cd python\ai-service && python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 
@@ -47,8 +44,9 @@ echo.
 echo 📋 Serviços em modo desenvolvimento:
 echo.
 echo   🚀 Backend (Spring Boot):  http://localhost:8081
-echo   🌐 Frontend (React):       http://localhost:3000
+echo   📘 Swagger Java:           http://localhost:8081/swagger-ui/index.html
 echo   🤖 Python AI:              http://localhost:8000
+echo   📘 Swagger Python:         http://localhost:8000/docs
 echo.
 echo 📋 Infraestrutura (Docker):
 echo.

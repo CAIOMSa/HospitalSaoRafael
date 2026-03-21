@@ -45,9 +45,10 @@ echo ========================================
 echo.
 echo 📋 Serviços disponíveis:
 echo.
-echo   🌐 Frontend:           http://localhost:80
 echo   🚀 CRM Core API:       http://localhost:8081
+echo   📘 Swagger Java:       http://localhost:8081/swagger-ui/index.html
 echo   🤖 Python AI Service:  http://localhost:8000
+echo   📘 Swagger Python:     http://localhost:8000/docs
 echo   🔐 Keycloak:           http://localhost:8080
 echo   📊 Grafana:            http://localhost:3001
 echo   📈 Prometheus:         http://localhost:9090
