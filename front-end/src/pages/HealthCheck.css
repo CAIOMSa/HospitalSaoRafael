@@ -1,0 +1,65 @@
+.health-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.health-header h1 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.health-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.overall-status {
+  margin-bottom: 30px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.status-indicator.healthy {
+  background: #d4edda;
+  border: 2px solid #28a745;
+}
+
+.status-indicator.degraded {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+}
+
+.status-indicator.critical {
+  background: #f8d7da;
+  border: 2px solid #dc3545;
+}
+
+.status-icon {
+  font-size: 3rem;
+}
+
+.status-indicator h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.status-indicator p {
+  margin: 5px 0 0 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.status-indicator small {
+  font-size: 0.85rem;
+  color: #999;
+}

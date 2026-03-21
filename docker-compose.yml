@@ -1,0 +1,355 @@
+version: '3.8'
+
+services:
+  # =====================
+  # Database Layer
+  # =====================
+  postgresql:
+    image: postgres:15-alpine
+    container_name: crm-postgresql
+    environment:
+      POSTGRES_DB: crm_db
+      POSTGRES_USER: crm_user
+      POSTGRES_PASSWORD: crm_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm_user -d crm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # Message Broker
+  # =====================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: crm-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: crm_user
+      RABBITMQ_DEFAULT_PASS: crm_password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # Cache Layer
+  # =====================
+  redis:
+    image: redis:7-alpine
+    container_name: crm-redis
+    command: redis-server --requirepass crm_password
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # Object Storage
+  # =====================
+  minio:
+    image: minio/minio:latest
+    container_name: crm-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =====================
+  # Authentication
+  # =====================
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: crm-keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgresql:5432/keycloak_db
+      KC_DB_USERNAME: crm_user
+      KC_DB_PASSWORD: crm_password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin123
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+    command: start-dev --import-realm
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - crm-network
+    volumes:
+      - ./keycloak/realm-config:/opt/keycloak/data/import
+
+  # =====================
+  # Backend - Spring Boot API
+  # =====================
+  crm-core:
+    build:
+      context: ./crm-core
+      dockerfile: Dockerfile
+    container_name: crm-core-api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/crm_db
+      SPRING_DATASOURCE_USERNAME: crm_user
+      SPRING_DATASOURCE_PASSWORD: crm_password
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PASSWORD: crm_password
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: crm_user
+      SPRING_RABBITMQ_PASSWORD: crm_password
+      KEYCLOAK_AUTH_SERVER_URL: http://localhost:8080
+      JWT_ISSUER_URI: http://localhost:8080/realms/crm-realm
+      JWK_SET_URI: http://keycloak:8080/realms/crm-realm/protocol/openid-connect/certs
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+    ports:
+      - "8081:8081"
+    extra_hosts:
+      - "localhost:host-gateway"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    networks:
+      - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # =====================
+  # Python AI/Analytics Microservice
+  # =====================
+  ai-service:
+    build:
+      context: ./python/ai-service
+      dockerfile: Dockerfile
+    container_name: crm-ai-service
+    environment:
+      DATABASE_URL: postgresql+asyncpg://crm_user:crm_password@postgresql:5432/crm_db
+      RABBITMQ_URL: amqp://crm_user:crm_password@rabbitmq:5672/
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin123
+      REDIS_HOST: redis
+      REDIS_PASSWORD: crm_password
+      AI_MODE: gguf
+      AI_MODEL_PATH: /app/Llama-3.1-8B-Instruct-Q4_K_M.gguf
+      AI_MODEL_CTX: 4096
+      AI_MODEL_THREADS: 8
+      AI_MODEL_TEMPERATURE: 0.2
+      AI_MODEL_MAX_TOKENS: 256
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - crm-network
+    volumes:
+      - ./python/ai-service:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # =====================
+  # Celery Worker for Background Tasks
+  # =====================
+  celery-worker:
+    build:
+      context: ./python/ai-service
+      dockerfile: Dockerfile
+    container_name: crm-celery-worker
+    command: celery -A app.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+asyncpg://crm_user:crm_password@postgresql:5432/crm_db
+      RABBITMQ_URL: amqp://crm_user:crm_password@rabbitmq:5672/
+      REDIS_HOST: redis
+      REDIS_PASSWORD: crm_password
+    depends_on:
+      - rabbitmq
+      - redis
+    networks:
+      - crm-network
+    volumes:
+      - ./python/ai-service:/app
+
+  # =====================
+  # Frontend - React
+  # =====================
+  frontend:
+    build:
+      context: ./front-end
+      dockerfile: Dockerfile
+    container_name: crm-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:8081/api
+      REACT_APP_KEYCLOAK_URL: http://localhost:8080
+      REACT_APP_KEYCLOAK_REALM: crm-realm
+      REACT_APP_KEYCLOAK_CLIENT_ID: crm-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - crm-core
+      - keycloak
+    networks:
+      - crm-network
+
+
+  # =====================
+  # Observability Layer
+  # =====================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: crm-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    networks:
+      - crm-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: crm-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - crm-network
+
+  loki:
+    image: grafana/loki:latest
+    container_name: crm-loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./docker/loki:/etc/loki
+      - loki_data:/loki
+    networks:
+      - crm-network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: crm-promtail
+    volumes:
+      - ./docker/promtail:/etc/promtail
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - crm-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: crm-jaeger
+    environment:
+      COLLECTOR_ZIPKIN_HOST_PORT: :9411
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    networks:
+      - crm-network
+
+  # =====================
+  # Reverse Proxy
+  # =====================
+  traefik:
+    image: traefik:v2.10
+    container_name: crm-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8888:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik:/etc/traefik
+    networks:
+      - crm-network
+
+networks:
+  crm-network:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+  rabbitmq_data:
+  redis_data:
+  minio_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:

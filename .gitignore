@@ -1,0 +1,64 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Archives and local backups
+*.zip
+*.tar
+*.tar.gz
+*.bak
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python AI service local artifacts
+python/ai-service/.env
+python/ai-service/.venv/
+python/ai-service/*.gguf
+
+# Node and frontend artifacts
+front-end/node_modules/
+front-end/build/
+front-end/dist/
+front-end/coverage/
+
+# Java and Maven artifacts
+crm-core/target/
+crm-core/build/
+
+# Docker and container local overrides
+docker-compose.override.yml
+
+# Temporary test outputs
+coverage/
+tmp/
+temp/
