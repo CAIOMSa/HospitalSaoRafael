@@ -6,7 +6,7 @@ echo ========================================
 echo.
 
 echo Parando todos os containers...
-docker-compose down
+docker-compose down --remove-orphans
 
 if errorlevel 1 (
     echo ❌ Erro ao parar os containers!

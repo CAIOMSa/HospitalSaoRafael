@@ -18,7 +18,12 @@ echo ✅ Docker está rodando
 
 echo.
 echo [2/5] Parando containers antigos (se houver)...
-docker-compose down >nul 2>&1
+docker-compose down --remove-orphans >nul 2>&1
+
+REM Limpar containers com nomes fixos que possam ter ficado órfãos
+for %%C in (crm-postgresql crm-rabbitmq crm-redis crm-minio crm-keycloak crm-core-api crm-ai-service crm-celery-worker crm-prometheus crm-grafana crm-loki crm-promtail crm-jaeger crm-traefik) do (
+    docker rm -f %%C >nul 2>&1
+)
 
 echo.
 echo [3/5] Construindo e iniciando todos os serviços...

@@ -8,8 +8,8 @@ admin123
 
 
 
-### Frontend (React)
-- **URL**: http://localhost:3000
+
+- **URL**: http://localhost:8080/
 - **Login**: Via Keycloak
 user: test.user 
 password: teste
