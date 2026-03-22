@@ -29,3 +29,9 @@ password: teste
 - **Prometheus**: http://localhost:9090
 - **Jaeger Tracing**: http://localhost:16686
 - **Traefik Dashboard**: http://localhost:8888
+
+
+### DB
+jdbc:postgresql://postgresql:5432/crm_db
+crm_user
+crm_password
