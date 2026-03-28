@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "cargo")
+@Table(name = "cargos")
 public class CargoEntity {
 
     @Id
@@ -22,10 +22,21 @@ public class CargoEntity {
     private String nivelHierarquico;
 
     @Column(name = "data_inicio", nullable = false)
-    private LocalDateTime dataInicio;
+    private LocalDateTime inicioVinculo;
 
     @Column(name = "atualizado_em")
     private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    public void prePersist() {
+        inicioVinculo = LocalDateTime.now();
+        atualizadoEm = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        atualizadoEm = LocalDateTime.now();
+    }
 
     public Long getId() {
         return id;
@@ -43,9 +54,7 @@ public class CargoEntity {
         this.cargo = cargo;
     }
 
-    public String getDepartamento() {
-        return departamento;
-    }
+    public String getDepartamento() {return departamento;}
 
     public void setDepartamento(String departamento) {
         this.departamento = departamento;
@@ -60,11 +69,11 @@ public class CargoEntity {
     }
 
     public LocalDateTime getDataInicio() {
-        return dataInicio;
+        return inicioVinculo;
     }
 
     public void setDataInicio(LocalDateTime dataInicio) {
-        this.dataInicio = dataInicio;
+        this.inicioVinculo = dataInicio;
     }
 
     public LocalDateTime getAtualizadoEm() {
@@ -74,4 +83,8 @@ public class CargoEntity {
     public void setAtualizadoEm(LocalDateTime atualizadoEm) {
         this.atualizadoEm = atualizadoEm;
     }
+
+    public LocalDateTime getInicioVinculo() {return inicioVinculo;}
+
+    public void setInicioVinculo(LocalDateTime inicioVinculo) {this.inicioVinculo = inicioVinculo;}
 }

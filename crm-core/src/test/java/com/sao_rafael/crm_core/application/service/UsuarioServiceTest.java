@@ -1,5 +1,6 @@
 package com.sao_rafael.crm_core.application.service;
 
+import com.sao_rafael.crm_core.infrastructure.persistence.entity.FuncionarioEntity;
 import com.sao_rafael.crm_core.infrastructure.persistence.entity.UsuarioEntity;
 import com.sao_rafael.crm_core.infrastructure.persistence.repository.FuncionarioJpaRepository;
 import com.sao_rafael.crm_core.infrastructure.persistence.repository.UsuarioJpaRepository;
@@ -39,8 +40,11 @@ class UsuarioServiceTest {
 
     @Test
     void createShouldSetDefaultsAndSave() {
+        FuncionarioEntity funcionario = new FuncionarioEntity();
+        funcionario.setId(5L);
+
         UsuarioEntity usuario = new UsuarioEntity();
-        usuario.setFuncionarioId(5L);
+        usuario.setFuncionario(funcionario);
         usuario.setEmail("teste@empresa.com");
         usuario.setSenhaHash("hash");
 
@@ -57,12 +61,15 @@ class UsuarioServiceTest {
 
     @Test
     void updateShouldThrowWhenEmailAlreadyExists() {
+        FuncionarioEntity funcionario = new FuncionarioEntity();
+        funcionario.setId(10L);
+
         UsuarioEntity current = new UsuarioEntity();
         current.setId(1L);
         current.setEmail("old@empresa.com");
 
         UsuarioEntity payload = new UsuarioEntity();
-        payload.setFuncionarioId(10L);
+        payload.setFuncionario(funcionario);
         payload.setEmail("novo@empresa.com");
         payload.setSenhaHash("novo");
         payload.setAtivo(true);

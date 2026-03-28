@@ -24,8 +24,8 @@ public class FuncionarioService extends BaseCrudService<FuncionarioEntity, Long>
         if (funcionarioRepository.existsByCpf(funcionario.getCpf())) {
             throw new IllegalArgumentException("CPF already exists: " + funcionario.getCpf());
         }
-        if (!cargoRepository.existsById(funcionario.getCargoId())) {
-            throw new IllegalArgumentException("Cargo not found: " + funcionario.getCargoId());
+        if (!cargoRepository.existsById(funcionario.getCargo().getId())) {
+            throw new IllegalArgumentException("Cargo not found: " + funcionario.getCargo());
         }
         if (funcionario.getAtivo() == null) {
             funcionario.setAtivo(true);
@@ -37,15 +37,15 @@ public class FuncionarioService extends BaseCrudService<FuncionarioEntity, Long>
 
     @Override
     protected void copyForUpdate(FuncionarioEntity current, FuncionarioEntity payload) {
-        if (!cargoRepository.existsById(payload.getCargoId())) {
-            throw new IllegalArgumentException("Cargo not found: " + payload.getCargoId());
+        if (!cargoRepository.existsById(payload.getCargo().getId())) {
+            throw new IllegalArgumentException("Cargo not found: " + payload.getCargo());
         }
         if (!current.getCpf().equals(payload.getCpf()) && funcionarioRepository.existsByCpf(payload.getCpf())) {
             throw new IllegalArgumentException("CPF already exists: " + payload.getCpf());
         }
         current.setNome(payload.getNome());
         current.setCpf(payload.getCpf());
-        current.setCargoId(payload.getCargoId());
+        current.setCargo(payload.getCargo());
         current.setAtivo(payload.getAtivo());
     }
 

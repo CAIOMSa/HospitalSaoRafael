@@ -6,11 +6,15 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "funcionarios")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class FuncionarioEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne(mappedBy = "funcionario")
+    private UsuarioEntity usuario;
 
     @Column(name = "nome", length = 100, nullable = false)
     private String nome;
@@ -18,8 +22,9 @@ public class FuncionarioEntity {
     @Column(name = "cpf", length = 14, nullable = false, unique = true)
     private String cpf;
 
-    @Column(name = "cargo_id", nullable = false)
-    private Long cargoId;
+    @ManyToOne
+    @JoinColumn(name = "cargo_id", nullable = false)
+    private CargoEntity cargo;
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo;
@@ -27,51 +32,36 @@ public class FuncionarioEntity {
     @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
-    public Long getId() {
-        return id;
+    @PrePersist
+    public void prePersist() {
+        criadoEm = LocalDateTime.now();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Long getId() {return id;}
 
-    public String getNome() {
-        return nome;
-    }
+    public void setId(Long id) {this.id = id;}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public String getNome() {return nome;}
 
-    public String getCpf() {
-        return cpf;
-    }
+    public void setNome(String nome) {this.nome = nome;}
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
+    public String getCpf() {return cpf;}
 
-    public Long getCargoId() {
-        return cargoId;
-    }
+    public void setCpf(String cpf) {this.cpf = cpf;}
 
-    public void setCargoId(Long cargoId) {
-        this.cargoId = cargoId;
-    }
+    public CargoEntity getCargo() {return cargo;}
 
-    public Boolean getAtivo() {
-        return ativo;
-    }
+    public void setCargo(CargoEntity cargo) {this.cargo = cargo;}
 
-    public void setAtivo(Boolean ativo) {
-        this.ativo = ativo;
-    }
+    public UsuarioEntity getUsuario() {return usuario;}
 
-    public LocalDateTime getCriadoEm() {
-        return criadoEm;
-    }
+    public void setUsuario(UsuarioEntity usuario) {this.usuario = usuario;}
 
-    public void setCriadoEm(LocalDateTime criadoEm) {
-        this.criadoEm = criadoEm;
-    }
+    public Boolean getAtivo() {return ativo;}
+
+    public void setAtivo(Boolean ativo) {this.ativo = ativo;}
+
+    public LocalDateTime getCriadoEm() {return criadoEm;}
+
+    public void setCriadoEm(LocalDateTime criadoEm) {this.criadoEm = criadoEm;}
 }

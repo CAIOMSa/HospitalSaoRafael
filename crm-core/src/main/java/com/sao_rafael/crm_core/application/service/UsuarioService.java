@@ -37,8 +37,8 @@ public class UsuarioService extends BaseCrudService<UsuarioEntity, Long> {
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new IllegalArgumentException("Email already exists: " + usuario.getEmail());
         }
-        if (!funcionarioRepository.existsById(usuario.getFuncionarioId())) {
-            throw new IllegalArgumentException("Funcionario not found: " + usuario.getFuncionarioId());
+        if (!funcionarioRepository.existsById(usuario.getFuncionario().getId())) {
+            throw new IllegalArgumentException("Funcionario not found: " + usuario.getFuncionario());
         }
         if (usuario.getAtivo() == null) {
             usuario.setAtivo(true);
@@ -50,13 +50,13 @@ public class UsuarioService extends BaseCrudService<UsuarioEntity, Long> {
 
     @Override
     protected void copyForUpdate(UsuarioEntity current, UsuarioEntity payload) {
-        if (!funcionarioRepository.existsById(payload.getFuncionarioId())) {
-            throw new IllegalArgumentException("Funcionario not found: " + payload.getFuncionarioId());
+        if (!funcionarioRepository.existsById(payload.getFuncionario().getId())) {
+            throw new IllegalArgumentException("Funcionario not found: " + payload.getFuncionario());
         }
         if (!current.getEmail().equals(payload.getEmail()) && usuarioRepository.existsByEmail(payload.getEmail())) {
             throw new IllegalArgumentException("Email already exists: " + payload.getEmail());
         }
-        current.setFuncionarioId(payload.getFuncionarioId());
+        current.setFuncionario(payload.getFuncionario());
         current.setEmail(payload.getEmail());
         current.setSenhaHash(payload.getSenhaHash());
         current.setAtivo(payload.getAtivo());
