@@ -1,5 +1,7 @@
 package com.sao_rafael.crm_core.application.service;
 
+import com.sao_rafael.crm_core.infrastructure.persistence.repository.BaseCrudRepository;
+import com.sao_rafael.crm_core.infrastructure.persistence.repository.PacienteJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -7,9 +9,9 @@ import java.util.List;
 @Transactional
 public abstract class BaseCrudService<E, ID> {
 
-    protected final org.springframework.data.jpa.repository.JpaRepository<E, ID> repository;
+    protected final BaseCrudRepository<E, ID> repository;
 
-    protected BaseCrudService(org.springframework.data.jpa.repository.JpaRepository<E, ID> repository) {
+    public BaseCrudService(BaseCrudRepository<E, ID> repository) {
         this.repository = repository;
     }
 

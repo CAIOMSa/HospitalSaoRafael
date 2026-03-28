@@ -1,5 +1,6 @@
 package com.sao_rafael.crm_core.application.service;
 
+import com.sao_rafael.crm_core.infrastructure.persistence.entity.CargoEntity;
 import com.sao_rafael.crm_core.infrastructure.persistence.entity.FuncionarioEntity;
 import com.sao_rafael.crm_core.infrastructure.persistence.repository.CargoJpaRepository;
 import com.sao_rafael.crm_core.infrastructure.persistence.repository.FuncionarioJpaRepository;
@@ -28,10 +29,13 @@ class FuncionarioServiceTest {
 
     @Test
     void createShouldValidateAndSetDefaults() {
+        CargoEntity cargo = new CargoEntity();
+        cargo.setId(10L);
+
         FuncionarioEntity funcionario = new FuncionarioEntity();
         funcionario.setNome("Joao");
         funcionario.setCpf("123.456.789-00");
-        funcionario.setCargoId(10L);
+        funcionario.setCargo(cargo);
 
         when(funcionarioRepository.existsByCpf("123.456.789-00")).thenReturn(false);
         when(cargoRepository.existsById(10L)).thenReturn(true);
@@ -46,9 +50,12 @@ class FuncionarioServiceTest {
 
     @Test
     void createShouldThrowWhenCpfAlreadyExists() {
+        CargoEntity cargo = new CargoEntity();
+        cargo.setId(1L);
+
         FuncionarioEntity funcionario = new FuncionarioEntity();
         funcionario.setCpf("123.456.789-00");
-        funcionario.setCargoId(1L);
+        funcionario.setCargo(cargo);
 
         when(funcionarioRepository.existsByCpf("123.456.789-00")).thenReturn(true);
 
@@ -64,10 +71,13 @@ class FuncionarioServiceTest {
         current.setId(1L);
         current.setCpf("111.111.111-11");
 
+        CargoEntity cargo = new CargoEntity();
+        cargo.setId(2L);
+
         FuncionarioEntity payload = new FuncionarioEntity();
         payload.setNome("Maria");
         payload.setCpf("222.222.222-22");
-        payload.setCargoId(2L);
+        payload.setCargo(cargo);
         payload.setAtivo(true);
 
         when(funcionarioRepository.findById(1L)).thenReturn(Optional.of(current));
