@@ -32,6 +32,19 @@ public class ConversaEntity {
     @Column(name = "atualizado_em", nullable = false)
     private LocalDateTime atualizadoEm;
 
+    @PrePersist
+    public void prePersist() {
+        if (iniciadoEm == null) {
+            iniciadoEm = LocalDateTime.now();
+        }
+        atualizadoEm = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        atualizadoEm = LocalDateTime.now();
+    }
+
     public Long getId() {return id;}
 
     public void setId(Long id) {this.id = id;}

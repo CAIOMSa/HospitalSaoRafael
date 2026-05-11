@@ -17,6 +17,7 @@ public class MensagemService extends BaseCrudService<MensagemEntity, Long> {
         current.setConversa(payload.getConversa());
         current.setEnviadoPor(payload.getEnviadoPor());
         current.setConteudo(payload.getConteudo());
+        current.setOrigem(payload.getOrigem());
 
     }
 

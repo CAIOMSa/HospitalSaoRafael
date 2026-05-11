@@ -21,8 +21,22 @@ public class MensagemEntity {
     @Column(name = "conteudo", length = 1000, nullable = false)
     private String conteudo;
 
+    @Column(name = "origem", length = 20, nullable = false)
+    private String origem;
+
     @Column(name = "data_envio", nullable = false)
     private LocalDateTime dataEnvio;
+
+    @PrePersist
+    public void prePersist() {
+        if (dataEnvio == null) {
+            dataEnvio = LocalDateTime.now();
+        }
+
+        if (origem == null || origem.isBlank()) {
+            origem = "OUTBOUND";
+        }
+    }
 
     public Long getId() {return id;}
 
@@ -39,6 +53,10 @@ public class MensagemEntity {
     public String getConteudo() {return conteudo;}
 
     public void setConteudo(String conteudo) {this.conteudo = conteudo;}
+
+    public String getOrigem() {return origem;}
+
+    public void setOrigem(String origem) {this.origem = origem;}
 
     public LocalDateTime getDataEnvio() {return dataEnvio;}
 

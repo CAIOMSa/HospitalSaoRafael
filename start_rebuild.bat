@@ -21,7 +21,7 @@ echo [2/5] Parando containers antigos (se houver)...
 docker-compose down --remove-orphans >nul 2>&1
 
 REM Limpar containers com nomes fixos que possam ter ficado órfãos
-for %%C in (crm-postgresql crm-rabbitmq crm-redis crm-minio crm-keycloak crm-core-api crm-ai-service crm-celery-worker crm-prometheus crm-grafana crm-loki crm-promtail crm-jaeger crm-traefik) do (
+for %%C in (crm-postgresql crm-rabbitmq crm-redis crm-minio crm-keycloak crm-core-api crm-frontend crm-ai-service crm-celery-worker crm-prometheus crm-grafana crm-loki crm-promtail crm-jaeger crm-traefik) do (
     docker rm -f %%C >nul 2>&1
 )
 
@@ -50,6 +50,7 @@ echo ========================================
 echo.
 echo 📋 Serviços disponíveis:
 echo.
+echo   🌐 Frontend React:      http://localhost:3000
 echo   🚀 CRM Core API:       http://localhost:8081
 echo   📘 Swagger Java:       http://localhost:8081/swagger-ui/index.html
 echo   🤖 Python AI Service:  http://localhost:8000

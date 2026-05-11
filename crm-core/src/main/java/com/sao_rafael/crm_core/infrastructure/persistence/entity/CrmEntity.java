@@ -1,5 +1,6 @@
 package com.sao_rafael.crm_core.infrastructure.persistence.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 
@@ -11,8 +12,9 @@ public class CrmEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "medico_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "medico_id", nullable = false, unique = true)
+    @JsonIgnoreProperties({"crm", "usuario", "cargo"})
     private MedicoEntity medico;
 
     @Column(name = "crm", length = 20, nullable = false)
