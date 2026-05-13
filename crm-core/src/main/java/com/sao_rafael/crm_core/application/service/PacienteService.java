@@ -17,6 +17,21 @@ public class PacienteService extends BaseCrudService<PacienteEntity, Long> {
         current.setCpf(payload.getCpf());
         current.setTelefone(payload.getTelefone());
         current.setEmail(payload.getEmail());
+        current.setDataNascimento(payload.getDataNascimento());
+        current.setSexo(payload.getSexo());
+        current.setAlturaCm(payload.getAlturaCm());
+        current.setPesoKg(payload.getPesoKg());
+        current.setEnderecos(payload.getEnderecos());
+
+        if (payload.getAtivo() != null) {
+            current.setAtivo(payload.getAtivo());
+        }
+    }
+
+    public PacienteEntity deactivate(Long id) {
+        PacienteEntity patient = getById(id);
+        patient.setAtivo(Boolean.FALSE);
+        return repository.save(patient);
     }
 
     @Override

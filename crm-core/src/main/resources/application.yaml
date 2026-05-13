@@ -67,6 +67,11 @@ keycloak:
   credentials:
     secret: crm-client-secret
 
+features:
+  nlp2sql:
+    enabled: ${NLP2SQL_ENABLED:true}
+    ai-service-url: ${NLP2SQL_AI_SERVICE_URL:http://localhost:8000}
+
 minio:
   endpoint: http://localhost:9000
   access-key: minioadmin
@@ -112,6 +117,11 @@ spring:
 
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL}
+
+features:
+  nlp2sql:
+    enabled: ${NLP2SQL_ENABLED:true}
+    ai-service-url: ${NLP2SQL_AI_SERVICE_URL:http://ai-service:8000}
 
 loki:
   url: http://loki:3100

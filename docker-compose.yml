@@ -136,6 +136,8 @@ services:
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin123
+      NLP2SQL_ENABLED: "true"
+      NLP2SQL_AI_SERVICE_URL: http://ai-service:8000
     ports:
       - "8081:8081"
     extra_hosts:
@@ -149,6 +151,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_started
+      ai-service:
+        condition: service_healthy
     networks:
       - crm-network
     healthcheck:
@@ -202,6 +206,8 @@ services:
       AI_MODEL_THREADS: 8
       AI_MODEL_TEMPERATURE: 0.2
       AI_MODEL_MAX_TOKENS: 256
+      NLP2SQL_ENABLED: "true"
+      NLP2SQL_MAX_ROWS: 100
     ports:
       - "8000:8000"
     depends_on:

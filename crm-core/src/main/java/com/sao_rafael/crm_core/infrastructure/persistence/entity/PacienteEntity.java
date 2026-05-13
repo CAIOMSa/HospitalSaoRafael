@@ -56,10 +56,16 @@ public class PacienteEntity {
     @Column(name = "atualizado_em", nullable = false)
     private LocalDateTime atualizadoEm;
 
+    @Column(name = "ativo")
+    private Boolean ativo;
+
     @PrePersist
     public void prePersist() {
         criadoEm = LocalDateTime.now();
         atualizadoEm = LocalDateTime.now();
+        if (ativo == null) {
+            ativo = Boolean.TRUE;
+        }
     }
 
     @PreUpdate
@@ -114,4 +120,8 @@ public class PacienteEntity {
     public List<EnderecoEntity> getEnderecos() {return enderecos;}
 
     public void setEnderecos(List<EnderecoEntity> enderecos) {this.enderecos = enderecos;}
+
+    public Boolean getAtivo() {return ativo;}
+
+    public void setAtivo(Boolean ativo) {this.ativo = ativo;}
 }

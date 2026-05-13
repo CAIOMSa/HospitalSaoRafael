@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     ai_model_threads: int = 4
     ai_model_temperature: float = 0.2
     ai_model_max_tokens: int = 256
+
+    nlp2sql_enabled: bool = True
+    nlp2sql_max_rows: int = 100
+    nlp2sql_max_question_length: int = 280
     
     class Config:
         env_file = ".env"
